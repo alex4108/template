@@ -22,6 +22,7 @@ spec:
       labels:
         name: DEPLOYMENT_NAME
     spec:
+      progressDeadlineSeconds: 90
       restartPolicy: Always
       containers:
       - name: DEPLOYMENT_NAME
