@@ -1,0 +1,41 @@
+#PVC Here
+# See
+# https://github.com/kubernetes/examples/blob/master/staging/volumes/nfs/nfs-web-rc.yaml
+# https://github.com/kubernetes/examples/blob/master/staging/volumes/nfs/nfs-pvc.yaml
+# https://github.com/kubernetes/examples/blob/master/staging/volumes/nfs/nfs-pv.yaml
+# https://github.com/kubernetes/examples/blob/master/staging/volumes/nfs/nfs-server-rc.yaml
+
+# TODO NFS Server will handle off-site'ing the sqlite.db
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: DEPLOYMENT_NAME
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: DEPLOYMENT_NAME
+  template:
+    metadata:
+      labels:
+        name: DEPLOYMENT_NAME
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: DEPLOYMENT_NAME
+        image: DOCKER_USER/PROJECT_NAME:v2-COMMIT
+        env:
+        - name: ENV
+          value: "ENVIRONMENT"
+        - name: BOT_TOKEN
+          valueFrom:
+          secretKeyRef:
+            name: PROJECT_NAME-environment-discord
+            key: password
+        - name: RUN_TESTS
+          value: "0"   
+        # TODO PVC Claim
+      imagePullSecrets:
+      - name: PROJECT_NAME-environment-docker
