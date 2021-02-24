@@ -26,6 +26,7 @@ elif [[ "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
     export ENV=TEST
 else 
     echo "Exiting early because I don't deploy pull requests"
+    exit 0
 fi
 
 DOCKER_TAG="${DOCKER_USER}/${PROJECT_NAME}:v2-${TRAVIS_COMMIT}"
