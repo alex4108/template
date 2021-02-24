@@ -9,9 +9,9 @@ chkErr() {
     fi
 }
 
-K8S_DEPLOYMENT_NAME="${PROJECT_NAME}-${ENV}"
-chkErr
 kube_env=$(echo "${ENV}" | awk '{print tolower($0)}')
+chkErr
+K8S_DEPLOYMENT_NAME="${PROJECT_NAME}-${ENV}"
 chkErr
 runDocker="docker run -v ${TRAVIS_BUILD_DIR}/kube:/kube bitnami/kubectl:latest"
 chkErr
