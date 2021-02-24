@@ -9,12 +9,17 @@ chkErr() {
     fi
 }
 
+
 kube_env=$(echo "${ENV}" | awk '{print tolower($0)}')
 chkErr
 K8S_DEPLOYMENT_NAME="${PROJECT_NAME}-${ENV}"
 chkErr
 runDocker="docker run -v ${TRAVIS_BUILD_DIR}/kube:/kube bitnami/kubectl:latest"
 chkErr
+kubeFlags="--kubeconfig /kube/kubeconfig --insecure-skip-tls-verify=true"
+kubectl="${kubectl}"
+chkErr
+
 
 sed -i -e "s|ENVIRONMENT|${ENV}|g" deployment.yml
 sed -i -e "s|environment|${kube_env}|g" deployment.yml
@@ -30,12 +35,20 @@ chkErr
 
 kubeFlags="--kubeconfig /kube/kubeconfig --insecure-skip-tls-verify=true"
 
-${runDocker} ${kubeFlags} delete secret ${K8S_DEPLOYMENT_NAME}-docker
-${runDocker} ${kubeFlags} delete secret ${K8S_DEPLOYMENT_NAME}-discord
-${runDocker} ${kubeFlags} create secret docker-registry ${K8S_DEPLOYMENT_NAME}-docker --docker-server=https://index.docker.io/v2/ --docker-username=${DOCKER_USER} --docker-password=\"${DOCKER_PASS}\" --docker-email=${DOCKER_EMAIL} 
+${kubectl} delete secret ${K8S_DEPLOYMENT_NAME}-docker
+${kubectl} delete secret ${K8S_DEPLOYMENT_NAME}-discord
+${kubectl} create secret docker-registry ${K8S_DEPLOYMENT_NAME}-docker --docker-server=https://index.docker.io/v2/ --docker-username=${DOCKER_USER} --docker-password=\"${DOCKER_PASS}\" --docker-email=${DOCKER_EMAIL} 
 chkErr
-${runDocker} ${kubeFlags} create secret generic ${K8S_DEPLOYMENT_NAME}-${kube_env}-discord --from-literal=username="discord" --from-literal=password="${BOT_TOKEN}"
+${kubectl} create secret generic ${K8S_DEPLOYMENT_NAME}-${kube_env}-discord --from-literal=username="discord" --from-literal=password="${BOT_TOKEN}"
 chkErr
-${runDocker} ${kubeFlags} apply -f /kube/deployment.yml
+${kubectl} apply -f /kube/deployment.yml
 chkErr
 
+${kubectl} rollout status deployment ${K8S_DEPLOYMENT_NAME}
+
+
+if ! ${kubectl} rollout status deployment ${K8S_DEPLOYMENT_NAME}; then
+    ${kubectl} rollout undo deployment ${K8S_DEPLOYMENT_NAME}
+    ${kubectl} rollout status deployment ${K8S_DEPLOYMENT_NAME}
+    exit 1
+fi
