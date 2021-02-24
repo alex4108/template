@@ -17,7 +17,7 @@ chkErr
 runDocker="docker run -v ${TRAVIS_BUILD_DIR}/kube:/kube bitnami/kubectl:latest"
 chkErr
 kubeFlags="--kubeconfig /kube/kubeconfig --insecure-skip-tls-verify=true"
-kubectl="${kubectl}"
+kubectl="${runDocker} ${kubeFlags}"
 chkErr
 
 
