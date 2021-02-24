@@ -34,7 +34,7 @@ ${runDocker} ${kubeFlags} delete secret ${K8S_DEPLOYMENT_NAME}-docker
 ${runDocker} ${kubeFlags} delete secret ${K8S_DEPLOYMENT_NAME}-discord
 ${runDocker} ${kubeFlags} create secret docker-registry ${K8S_DEPLOYMENT_NAME}-docker --docker-server=https://index.docker.io/v2/ --docker-username=${DOCKER_USER} --docker-password=\"${DOCKER_PASS}\" --docker-email=${DOCKER_EMAIL} 
 chkErr
-${runDocker} ${kubeFlags} create secret generic ${K8S_DEPLOYMENT_NAME}-${kube_env}-discord --from-literal=username=\"discord\" --from-literal=password=\"${BOT_TOKEN}\"
+${runDocker} ${kubeFlags} create secret generic ${K8S_DEPLOYMENT_NAME}-${kube_env}-discord --from-literal=username="discord" --from-literal=password="${BOT_TOKEN}"
 chkErr
 ${runDocker} ${kubeFlags} apply -f /kube/deployment.yml
 chkErr
